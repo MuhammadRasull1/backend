@@ -1,0 +1,133 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Пользователи системы
+model User {
+  telegramId BigInt   @id @map("telegram_id")
+  role       UserRole @default(MANAGER)
+  firstName  String?  @map("first_name")
+  lastName   String?  @map("last_name")
+  username   String?
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  // Связи
+  projects Project[]
+
+  @@map("users")
+}
+
+// Роли пользователей
+enum UserRole {
+  MANAGER // Прораб
+  WORKER  // Рабочий
+  ADMIN   // Администратор
+}
+
+// Проекты (объекты)
+model Project {
+  id              String        @id @default(uuid())
+  managerId       BigInt        @map("manager_id")
+  name            String
+  address         String?
+  status          ProjectStatus @default(DRAFT)
+  area            Decimal       @db.Decimal(10, 2)
+  ceilingHeight   Decimal       @map("ceiling_height") @db.Decimal(5, 2)
+  currency        Currency      @default(UZS)
+  commissionType  CommissionType @map("commission_type") @default(PERCENT)
+  commissionValue Decimal       @map("commission_value") @db.Decimal(10, 2)
+  finalQuote      Decimal?      @map("final_quote") @db.Decimal(12, 2) // Итоговая сумма КП для клиента
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  // Связи
+  manager   User              @relation(fields: [managerId], references: [telegramId], onDelete: Cascade)
+  materials ProjectMaterial[]
+  workers   ProjectWorker[]
+  volumes   ProjectVolume[]
+
+  @@index([managerId])
+  @@index([status])
+  @@map("projects")
+}
+
+// Статусы проектов
+enum ProjectStatus {
+  DRAFT       // Черновик
+  IN_PROGRESS // В работе
+  COMPLETED   // Выполнен
+}
+
+// Валюты
+enum Currency {
+  UZS // Узбекский сум
+  USD // Доллар США
+}
+
+// Типы комиссии
+enum CommissionType {
+  PERCENT // Процент от сметы
+  FIXED   // Фиксированная сумма
+}
+
+// Материалы проекта
+model ProjectMaterial {
+  id           String   @id @default(uuid())
+  projectId    String   @map("project_id")
+  materialId   String   @map("material_id") // ID материала из справочника
+  name         String
+  unit         String   // Единица измерения (м, шт, кг и т.д.)
+  quantity     Decimal  @db.Decimal(10, 2)
+  pricePerUnit Decimal  @map("price_per_unit") @db.Decimal(10, 2)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Связи
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("project_materials")
+}
+
+// Ставки мастеров на объекте
+model ProjectWorker {
+  id          String   @id @default(uuid())
+  projectId   String   @map("project_id")
+  workerLabel String   @map("worker_label") // Название работы/мастера
+  ratePerSqM  Decimal  @map("rate_per_sq_m") @db.Decimal(10, 2) // Ставка за кв.м
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Связи
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("project_workers")
+}
+
+// Объемы работ (рассчитываются по ПУЭ-7)
+model ProjectVolume {
+  id          String   @id @default(uuid())
+  projectId   String   @map("project_id")
+  volumeType  String   @map("volume_type") // Тип работы (розетки, выключатели и т.д.)
+  quantity    Decimal  @db.Decimal(10, 2) // Количество
+  unit        String   // Единица измерения
+  isManual    Boolean  @default(false) @map("is_manual") // Ручная корректировка
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Связи
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("project_volumes")
+}
