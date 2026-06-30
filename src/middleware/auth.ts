@@ -100,7 +100,7 @@ export async function validateTelegramAuth(
     });
 
     req.user = {
-      telegramId: Number(user.telegramId),
+      telegramId: String(user.telegramId),
       role: user.role,
       firstName: user.firstName || undefined,
       lastName: user.lastName || undefined,

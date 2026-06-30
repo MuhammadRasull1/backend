@@ -4,7 +4,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 
 export interface JwtPayload {
-  telegramId: number;
+  telegramId: string;
   role: string;
   firstName?: string;
   lastName?: string;
@@ -16,7 +16,7 @@ export interface JwtPayload {
  */
 export function generateToken(payload: JwtPayload): string {
   return jwt.sign(payload, JWT_SECRET, {
-    expiresIn: JWT_EXPIRES_IN,
+    expiresIn: JWT_EXPIRES_IN as any,
   });
 }
 

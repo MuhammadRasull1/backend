@@ -1,22 +1,44 @@
-import bot from '../bot/index';
-import express from 'express';
+import { Request } from 'express';
 
-const app = express();
-const PORT = 3000;
+export interface AuthRequest extends Request {
+  user?: { telegramId: string; [key: string]: any };
+}
 
-app.get('/', (_req, res) => {
-    res.send('Бригадир-бэкенд работает');
-});
+export interface ApiResponse {
+  success: boolean;
+  data?: any;
+  message?: string;
+  error?: string;
+}
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+export interface TelegramWebAppInitData {
+  query_id?: string;
+  user?: any;
+  auth_date?: number | string;
+  hash?: string;
+}
 
-bot.launch().then(() => {
-    console.log("Bot is running...");
-}).catch((err) => {
-    console.error("Ошибка запуска бота:", err);
-});
+export interface CreateProjectDto {
+  name: string;
+  address: string;
+  area: number;
+  ceilingHeight: number;
+  currency: string;
+  commissionType: string;
+  commissionValue: number;
+  materials?: any[];
+  workers?: any[];
+  volumes?: any[];
+}
 
-process.once('SIGINT', () => bot.stop('SIGINT'));
-process.once('SIGTERM', () => bot.stop('SIGTERM'));
+export interface UpdateProjectDto {
+  name?: string;
+  address?: string;
+  status?: string;
+  area?: number;
+  ceilingHeight?: number;
+  currency?: string;
+  commissionType?: string;
+  commissionValue?: number;
+  finalQuote?: number | null;
+}

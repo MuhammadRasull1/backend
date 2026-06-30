@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest, ApiResponse, CreateProjectDto, UpdateProjectDto } from '../types';
 import prisma from '../config/database';
-import { Prisma } from '@prisma/client';
+import { Prisma, Currency, CommissionType } from '@prisma/client';
 
 /**
  * Получить все проекты текущего пользователя
@@ -153,8 +153,8 @@ export async function createProject(req: AuthRequest, res: Response): Promise<vo
         address: data.address,
         area: new Prisma.Decimal(data.area),
         ceilingHeight: new Prisma.Decimal(data.ceilingHeight),
-        currency: data.currency,
-        commissionType: data.commissionType,
+        currency: data.currency as Currency,
+        commissionType: data.commissionType as CommissionType,
         commissionValue: new Prisma.Decimal(data.commissionValue),
         materials: data.materials
           ? {
@@ -261,11 +261,11 @@ export async function updateProject(req: AuthRequest, res: Response): Promise<vo
       data: {
         ...(data.name && { name: data.name }),
         ...(data.address !== undefined && { address: data.address }),
-        ...(data.status && { status: data.status }),
+        ...(data.status && { status: data.status as any }),
         ...(data.area && { area: new Prisma.Decimal(data.area) }),
         ...(data.ceilingHeight && { ceilingHeight: new Prisma.Decimal(data.ceilingHeight) }),
-        ...(data.currency && { currency: data.currency }),
-        ...(data.commissionType && { commissionType: data.commissionType }),
+        ...(data.currency && { currency: data.currency as any }),
+        ...(data.commissionType && { commissionType: data.commissionType as any }),
         ...(data.commissionValue && { commissionValue: new Prisma.Decimal(data.commissionValue) }),
         ...(data.finalQuote !== undefined && {
           finalQuote: data.finalQuote ? new Prisma.Decimal(data.finalQuote) : null,
