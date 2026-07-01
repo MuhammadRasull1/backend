@@ -11,7 +11,7 @@ bot.command('start', async (ctx) => {
             inline_keyboard: [
                 [{ 
                     text: "Открыть Web App", 
-                    web_app: { url: "https://backend-359b.onrender.com" } 
+                    web_app: { url: `${process.env.APP_URL || 'https://backend-359b.onrender.com'}/app` } 
                 }]
             ]
         }

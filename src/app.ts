@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import authRoutes from './routes/authRoutes';
 import projectRoutes from './routes/projectRoutes';
+import path from 'path';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 
 const app: Express = express();
@@ -41,6 +42,14 @@ app.use(express.urlencoded({ extended: true }));
 // Healthcheck endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Serve static frontend files
+app.use(express.static(path.join(__dirname, '../dist')));
+
+// Serve Web App index.html
+app.get('/app', (_req, res) => {
+  res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
 // API Routes
