@@ -45,11 +45,12 @@ app.get('/health', (req, res) => {
 });
 
 // Serve static frontend files
-app.use(express.static(path.join(__dirname, '../dist')));
+const distPath = path.join(process.cwd(), 'dist');
+app.use(express.static(distPath));
 
 // Serve Web App index.html
 app.get('/app', (_req, res) => {
-  res.sendFile(path.join(__dirname, '../dist/index.html'));
+  res.sendFile(path.join(distPath, 'index.html'));
 });
 
 // API Routes
