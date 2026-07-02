@@ -25,8 +25,12 @@ app.use(
 );
 
 // Безопасность
-app.use(helmet());
-
+app.use(
+  helmet({
+    frameguard: false,
+    contentSecurityPolicy: false,
+  })
+);
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 минут
