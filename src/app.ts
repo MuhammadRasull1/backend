@@ -51,6 +51,7 @@ app.get('/health', (req, res) => {
 // Serve static frontend files
 const publicPath = path.join(process.cwd(), 'public');
 app.use(express.static(publicPath));
+app.use('/assets', express.static(path.join(publicPath, 'assets')));
 
 // Serve Web App index.html
 app.get('/app', (_req, res) => {
@@ -66,5 +67,10 @@ app.use(notFoundHandler);
 
 // Глобальный обработчик ошибок
 app.use(errorHandler);
+
+app.use((err: any, req: any, res: any, next: any) => {
+  console.error('❌ Express Error Stack:', err);
+  res.status(500).send('Internal Server Error');
+});
 
 export default app;
