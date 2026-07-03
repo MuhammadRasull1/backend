@@ -10,19 +10,7 @@ import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 const app: Express = express();
 
 // Настройка CORS
-const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:5173'];
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-    credentials: true,
-  })
-);
+app.use(cors());
 
 // Безопасность
 app.use(
